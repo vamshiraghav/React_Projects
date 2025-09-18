@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/todo_class/", "destination": "https://<DEPLOY-URL-C1>/" },
-    { "source": "/todo_class/:match*", "destination": "https://<DEPLOY-URL-C1>/:match*" }
+    { "source": "/todo_class/", "destination": "https://react-projects-nine-beige.vercel.app/todo_class/" },
+    { "source": "/todo_class/:match*", "destination": "https://react-projects-nine-beige.vercel.app/todo_class/:match*" }
 
   ]
 }
