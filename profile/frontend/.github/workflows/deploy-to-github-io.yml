@@ -1,0 +1,79 @@
+name: Build & Sync Vite Frontend to vamshiraghav.github.io
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'profile/frontend/**'
+      - '.github/workflows/deploy-to-github-io.yml'
+  workflow_dispatch: {}
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-github-io
+      cancel-in-progress: true
+    env:
+      WORKDIR: profile/frontend
+      BUILD_DIR: dist
+      TARGET_REPO: vamshiraghav/vamshiraghav.github.io
+      TARGET_BRANCH: master
+
+    steps:
+      - name: Checkout source repo (REACT_PROJECTS)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '${{ env.WORKDIR }}/package-lock.json'
+
+      - name: Install deps
+        working-directory: ${{ env.WORKDIR }}
+        run: npm ci
+
+      - name: Build (Vite)
+        working-directory: ${{ env.WORKDIR }}
+        run: |
+          npm run build
+          test -d "${{ env.BUILD_DIR }}" || (echo "Build dir $BUILD_DIR not found" && exit 1)
+
+      - name: Prepare artifact (and 404.html for SPA)
+        run: |
+          mkdir -p artifact
+          cp -R "${{ env.WORKDIR }}/${{ env.BUILD_DIR }}/." artifact/
+          # SPA fallback for GitHub Pages refresh on client routes
+          if [ -f "artifact/index.html" ]; then cp artifact/index.html artifact/404.html; fi
+
+      - name: Clone target repo (vamshiraghav.github.io)
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git clone --depth 1 "https://x-access-token:${{ secrets.TARGET_REPO_PAT }}@github.com/${{ env.TARGET_REPO }}.git" target-repo
+          cd target-repo
+          git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }}
+
+      - name: Copy build into target root (no deletions)
+        run: |
+          # Update/overwrite same-name files and add new ones.
+          # Not using --delete keeps unrelated files already in the target repo.
+          rsync -av artifact/ target-repo/ \
+            --exclude='.git' \
+            --exclude='.github/'
+
+      - name: Commit & push if changed
+        run: |
+          cd target-repo
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Deploy Vite build from ${GITHUB_REPOSITORY}@${GITHUB_SHA:0:7} (${WORKDIR})"
+            git push origin ${{ env.TARGET_BRANCH }}
+          else
+            echo "No changes to commit."
+          fi

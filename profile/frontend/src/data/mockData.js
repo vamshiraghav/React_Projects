@@ -43,7 +43,7 @@ export const experience = [
     position: "Staff Software Engineer",
     duration: "January 2023 - Present",
     period: "2 years 9 months",
-    location: "Remote",
+    location: "Hyderabad | Hybrid",
     description: "Leading modernization of legacy systems serving 10M+ enterprise users and AI/ML initiatives",
     achievements: [
       "Architected microservices platform serving 10M+ users with 99.99% uptime",
