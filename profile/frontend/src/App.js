@@ -1,6 +1,6 @@
 import React from "react";
 // import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, HashRouter } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Skills from "./components/Skills";
@@ -40,14 +40,22 @@ const Home = () => {
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
+          {/* Default: Home at "/" */}
           <Route path="/" element={<Home />} />
-          <Route path="/healthtrack" element={<PutLocalApp storageKey="put.app.v1" initialTheme="light" />} />
+
+          {/* Tracker at "/healthtrack" */}
+          <Route
+            path="/healthtrack"
+            element={<PutLocalApp storageKey="put.app.v1" initialTheme="light" />}
+          />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }
+
+
 
 export default App;
