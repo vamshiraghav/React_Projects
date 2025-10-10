@@ -1,5 +1,5 @@
 import React from "react";
-import "./App.css";
+// import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
@@ -11,6 +11,7 @@ import Achievements from "./components/Achievements";
 import CodingPlatforms from "./components/CodingPlatforms";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import PutLocalApp from "./PutLocalApp";
 
 const Home = () => {
   return (
@@ -42,6 +43,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/healthtrack" element={<PutLocalApp storageKey="put.app.v1" initialTheme="light" />} />
         </Routes>
       </BrowserRouter>
     </div>
